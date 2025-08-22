@@ -236,7 +236,33 @@ export function RevisionPage() {
               {getFilteredChapters.map(({ chapter, subjectName }) => (
                 <div
                   key={chapter.id}
-                  className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200"
+                  className={`rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 ${
+                    chapter.scheduledRevisionDate
+                      ? (
+                          () => {
+                            const today = new Date()
+                            const scheduled = new Date(chapter.scheduledRevisionDate)
+                            const diffDays = Math.ceil((scheduled.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+                            if (diffDays < 0) return "bg-red-50 border-2 border-red-200" // Overdue
+                            if (diffDays === 0) return "bg-orange-50 border-2 border-orange-200" // Due today
+                            if (diffDays <= 3) return "bg-yellow-50 border-2 border-yellow-200" // Due soon
+                            return "bg-blue-50 border-2 border-blue-200" // Scheduled
+                          }
+                        )()
+                      : chapter.lastRevisedDate
+                        ? (() => {
+                            const now = new Date()
+                            const revised = new Date(chapter.lastRevisedDate)
+                            const diffDays = Math.floor((now.getTime() - revised.getTime()) / (1000 * 60 * 60 * 24))
+
+                            if (diffDays === 0) return "bg-emerald-50 border-2 border-emerald-200" // Revised today
+                            if (diffDays <= 7) return "bg-green-50 border-2 border-green-200" // Recently revised
+                            if (diffDays <= 30) return "bg-slate-50 border-2 border-slate-200" // Needs revision
+                            return "bg-gray-50 border-2 border-gray-300" // Long overdue
+                          })()
+                        : "bg-red-50 border-2 border-red-300" // Never revised
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -259,7 +285,18 @@ export function RevisionPage() {
                       </div>
                       <p className="text-sm text-slate-600 mb-1">{getTimeSinceRevision(chapter.lastRevisedDate)}</p>
                       {chapter.scheduledRevisionDate && (
-                        <p className="text-sm text-blue-600 font-medium flex items-center gap-1">
+                        <p
+                          className={`text-sm font-medium flex items-center gap-1 ${(() => {
+                            const today = new Date()
+                            const scheduled = new Date(chapter.scheduledRevisionDate)
+                            const diffDays = Math.ceil((scheduled.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+                            if (diffDays < 0) return "text-red-700" // Overdue
+                            if (diffDays === 0) return "text-orange-700" // Due today
+                            if (diffDays <= 3) return "text-yellow-700" // Due soon
+                            return "text-blue-700" // Scheduled
+                          })()}`}
+                        >
                           <Calendar className="w-3 h-3" />
                           {getScheduleStatus(chapter)}
                           {chapter.notificationEnabled && <Bell className="w-3 h-3" />}

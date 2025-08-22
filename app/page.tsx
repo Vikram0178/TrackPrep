@@ -29,7 +29,7 @@ export default function SyllabusChecklist() {
   const [showAddSubjectDialog, setShowAddSubjectDialog] = useState(false)
   const [showDeleteSubjectDialog, setShowDeleteSubjectDialog] = useState(false)
   const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null)
-  const [isRgbLightActive, setIsRgbLightActive] = useState(false)
+  const [isRgbLightOn, setIsRgbLightOn] = useState(true)
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const [isLongPressing, setIsLongPressing] = useState(false)
@@ -184,7 +184,7 @@ export default function SyllabusChecklist() {
   const dynamicGreeting = state.userProfile ? getDynamicGreeting(state.userProfile.name) : ""
 
   const handleMotivationBoxClick = () => {
-    setIsRgbLightActive(!isRgbLightActive)
+    setIsRgbLightOn(!isRgbLightOn)
   }
 
   return (
@@ -251,7 +251,9 @@ export default function SyllabusChecklist() {
           )}
 
           <div
-            className={`bg-blue-50 border border-blue-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden rgb-rotating-light ${isRgbLightActive ? "active" : ""}`}
+            className={`bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden cursor-pointer neon-border ${
+              isRgbLightOn ? "" : "neon-off"
+            }`}
             onClick={handleMotivationBoxClick}
           >
             <div className="relative z-10">
@@ -263,9 +265,9 @@ export default function SyllabusChecklist() {
                     </svg>
                   </div>
                 </div>
-                <h2 className="text-blue-800 font-semibold tracking-tight">Daily Motivation</h2>
+                <h2 className="text-gray-800 font-semibold tracking-tight">Daily Motivation</h2>
               </div>
-              <p className="text-blue-700 italic text-sm leading-relaxed pl-11">"{dailyQuote}"</p>
+              <p className="text-gray-700 italic text-sm leading-relaxed pl-11">"{dailyQuote}"</p>
             </div>
           </div>
 

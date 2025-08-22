@@ -148,58 +148,105 @@
   will-change: transform, opacity, color, background-color;
 }
 
-/* Adding enhanced RGB rotating light with higher intensity and continuous rotation for daily motivation box */
-.rgb-rotating-light {
+/* Updated neon border to use fade in/out color switching instead of rotation */
+.neon-border {
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.rgb-rotating-light::before {
+.neon-border::before {
   content: "";
   position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255, 0, 128, 0.8) 0deg,
-    rgba(255, 128, 0, 0.8) 60deg,
-    rgba(128, 255, 0, 0.8) 120deg,
-    rgba(0, 255, 128, 0.8) 180deg,
-    rgba(0, 128, 255, 0.8) 240deg,
-    rgba(128, 0, 255, 0.8) 300deg,
-    rgba(255, 0, 128, 0.8) 360deg
-  );
-  border-radius: inherit;
-  animation: rgb-rotate 2s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-}
-
-.rgb-rotating-light.active::before {
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: calc(1rem + 4px);
+  animation: fade-rgb-colors 4s ease-in-out infinite;
   opacity: 1;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+  filter: blur(2px) brightness(1.8) saturate(2.2);
 }
 
-@keyframes rgb-rotate {
+.neon-border.neon-off::before {
+  opacity: 0;
+}
+
+.neon-border::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+.neon-border .relative {
+  z-index: 2;
+}
+
+/* Enhanced keyframes with brighter colors and stronger glow effects */
+@keyframes fade-rgb-colors {
   0% {
-    transform: rotate(0deg);
+    border: 4px solid #ff0080;
+    box-shadow: 0 0 30px #ff0080, 0 0 60px #ff0080, 0 0 90px #ff0080, inset 0 0 30px rgba(255, 0, 128, 0.4);
+  }
+  8.33% {
+    border: 4px solid #ff0040;
+    box-shadow: 0 0 30px #ff0040, 0 0 60px #ff0040, 0 0 90px #ff0040, inset 0 0 30px rgba(255, 0, 64, 0.4);
+  }
+  16.66% {
+    border: 4px solid #ff3300;
+    box-shadow: 0 0 30px #ff3300, 0 0 60px #ff3300, 0 0 90px #ff3300, inset 0 0 30px rgba(255, 51, 0, 0.4);
+  }
+  25% {
+    border: 4px solid #ff6600;
+    box-shadow: 0 0 30px #ff6600, 0 0 60px #ff6600, 0 0 90px #ff6600, inset 0 0 30px rgba(255, 102, 0, 0.4);
+  }
+  33.33% {
+    border: 4px solid #ffcc00;
+    box-shadow: 0 0 30px #ffcc00, 0 0 60px #ffcc00, 0 0 90px #ffcc00, inset 0 0 30px rgba(255, 204, 0, 0.4);
+  }
+  41.66% {
+    border: 4px solid #ccff00;
+    box-shadow: 0 0 30px #ccff00, 0 0 60px #ccff00, 0 0 90px #ccff00, inset 0 0 30px rgba(204, 255, 0, 0.4);
+  }
+  50% {
+    border: 4px solid #00ff44;
+    box-shadow: 0 0 30px #00ff44, 0 0 60px #00ff44, 0 0 90px #00ff44, inset 0 0 30px rgba(0, 255, 68, 0.4);
+  }
+  58.33% {
+    border: 4px solid #00ff99;
+    box-shadow: 0 0 30px #00ff99, 0 0 60px #00ff99, 0 0 90px #00ff99, inset 0 0 30px rgba(0, 255, 153, 0.4);
+  }
+  66.66% {
+    border: 4px solid #0099ff;
+    box-shadow: 0 0 30px #0099ff, 0 0 60px #0099ff, 0 0 90px #0099ff, inset 0 0 30px rgba(0, 153, 255, 0.4);
+  }
+  75% {
+    border: 4px solid #0066ff;
+    box-shadow: 0 0 30px #0066ff, 0 0 60px #0066ff, 0 0 90px #0066ff, inset 0 0 30px rgba(0, 102, 255, 0.4);
+  }
+  83.33% {
+    border: 4px solid #9900ff;
+    box-shadow: 0 0 30px #9900ff, 0 0 60px #9900ff, 0 0 90px #9900ff, inset 0 0 30px rgba(153, 0, 255, 0.4);
+  }
+  91.66% {
+    border: 4px solid #cc00ff;
+    box-shadow: 0 0 30px #cc00ff, 0 0 60px #cc00ff, 0 0 90px #cc00ff, inset 0 0 30px rgba(204, 0, 255, 0.4);
   }
   100% {
-    transform: rotate(360deg);
+    border: 4px solid #ff0080;
+    box-shadow: 0 0 30px #ff0080, 0 0 60px #ff0080, 0 0 90px #ff0080, inset 0 0 30px rgba(255, 0, 128, 0.4);
   }
 }
 
-.rgb-rotating-light::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: inherit;
-  border-radius: inherit;
-  z-index: 1;
+.neon-border.neon-off {
+  box-shadow: none;
 }
