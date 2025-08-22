@@ -33,13 +33,16 @@ const initialState: AppState = {
   currentDate: getCurrentDate(), // Using dynamic date function
   loading: false, // No loading needed for localStorage
   userProfile: undefined, // Added userProfile to initial state
-  isDarkMode: false, // Added dark mode state
+  tests: [], // Added tests array to initial state
 }
 
 type AppAction =
   | { type: "SET_ACTIVE_SUBJECT"; payload: string } // Changed to string to support custom subjects
   | { type: "TOGGLE_SIDEBAR" }
-  | { type: "SET_CURRENT_PAGE"; payload: "checklist" | "analysis" | "priority" | "howto" } // Added howto page type
+  | {
+      type: "SET_CURRENT_PAGE"
+      payload: "checklist" | "analysis" | "priority" | "howto" | "revision" | "test" | "testanalysis" | "databackup" // Added databackup page type
+    }
   | {
       type: "ADD_CHAPTER"
       payload: {
@@ -52,6 +55,9 @@ type AppAction =
   | { type: "DELETE_CHAPTER"; payload: { chapterId: string } }
   | { type: "SET_CHAPTER_DIFFICULTY"; payload: { chapterId: string; difficulty: "easy" | "medium" | "hard" | "none" } }
   | { type: "SET_CHAPTER_TARGET_DATE"; payload: { chapterId: string; targetDate: string } }
+  | { type: "MARK_CHAPTER_REVISED"; payload: { chapterId: string } } // Added revision tracking action
+  | { type: "SCHEDULE_REVISION"; payload: { chapterId: string; date: string; enableNotification: boolean } } // Added revision scheduling action
+  | { type: "CANCEL_REVISION_SCHEDULE"; payload: { chapterId: string } } // Added cancel revision schedule action
   | { type: "ADD_ACTIVITY"; payload: { chapterId: string; name: string } }
   | { type: "RENAME_ACTIVITY"; payload: { chapterId: string; activityId: string; newName: string } }
   | { type: "DELETE_ACTIVITY"; payload: { chapterId: string; activityId: string } }
@@ -63,7 +69,10 @@ type AppAction =
   | { type: "ADD_SUBJECT"; payload: { name: string; shortName: string } } // Added custom subject actions
   | { type: "DELETE_SUBJECT"; payload: { subjectId: string } }
   | { type: "SET_USER_PROFILE"; payload: UserProfile } // Added user profile action
-  | { type: "TOGGLE_DARK_MODE" } // Completely removed trailing backslash
+  | { type: "ADD_TEST"; payload: any } // Added test management action
+  | { type: "EDIT_TEST"; payload: { testId: string; testData: any } } // Added edit and delete test actions
+  | { type: "DELETE_TEST"; payload: { testId: string } }
+  | { type: "IMPORT_DATA"; payload: any } // Added import data action
 
 const saveToStorage = (state: AppState) => {
   try {
@@ -88,14 +97,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
   switch (action.type) {
     case "LOAD_FROM_STORAGE":
-      return { ...action.payload, currentDate: getCurrentDate() }
+      return { ...action.payload, currentDate: getCurrentDate(), currentPage: "checklist", sidebarOpen: false }
 
     case "UPDATE_CURRENT_DATE":
       newState = { ...state, currentDate: getCurrentDate() }
-      break
-
-    case "TOGGLE_DARK_MODE": // Added dark mode toggle case
-      newState = { ...state, isDarkMode: !state.isDarkMode }
       break
 
     case "SET_ACTIVE_SUBJECT":
@@ -178,6 +183,56 @@ function appReducer(state: AppState, action: AppAction): AppState {
         subjects: state.subjects.map((subject) => ({
           ...subject,
           chapters: subject.chapters.filter((chapter) => chapter.id !== action.payload.chapterId),
+        })),
+      }
+      break
+
+    case "MARK_CHAPTER_REVISED": // Added revision tracking case
+      newState = {
+        ...state,
+        subjects: state.subjects.map((subject) => ({
+          ...subject,
+          chapters: subject.chapters.map((chapter) =>
+            chapter.id === action.payload.chapterId
+              ? { ...chapter, lastRevisedDate: new Date().toISOString() }
+              : chapter,
+          ),
+        })),
+      }
+      break
+
+    case "SCHEDULE_REVISION": // Added revision scheduling case
+      newState = {
+        ...state,
+        subjects: state.subjects.map((subject) => ({
+          ...subject,
+          chapters: subject.chapters.map((chapter) =>
+            chapter.id === action.payload.chapterId
+              ? {
+                  ...chapter,
+                  scheduledRevisionDate: action.payload.date,
+                  notificationEnabled: action.payload.enableNotification,
+                }
+              : chapter,
+          ),
+        })),
+      }
+      break
+
+    case "CANCEL_REVISION_SCHEDULE": // Added cancel revision schedule case
+      newState = {
+        ...state,
+        subjects: state.subjects.map((subject) => ({
+          ...subject,
+          chapters: subject.chapters.map((chapter) =>
+            chapter.id === action.payload.chapterId
+              ? {
+                  ...chapter,
+                  scheduledRevisionDate: undefined,
+                  notificationEnabled: undefined,
+                }
+              : chapter,
+          ),
         })),
       }
       break
@@ -315,6 +370,43 @@ function appReducer(state: AppState, action: AppAction): AppState {
       }
       break
 
+    case "ADD_TEST":
+      const newTest = {
+        ...action.payload,
+        id: `test-${Date.now()}`,
+      }
+
+      newState = {
+        ...state,
+        tests: [...(state.tests || []), newTest],
+      }
+      break
+
+    case "EDIT_TEST": // Added edit test case
+      newState = {
+        ...state,
+        tests: (state.tests || []).map((test) =>
+          test.id === action.payload.testId ? { ...test, ...action.payload.testData } : test,
+        ),
+      }
+      break
+
+    case "DELETE_TEST": // Added delete test case
+      newState = {
+        ...state,
+        tests: (state.tests || []).filter((test) => test.id !== action.payload.testId),
+      }
+      break
+
+    case "IMPORT_DATA": // Added import data case
+      newState = {
+        ...action.payload,
+        currentDate: getCurrentDate(), // Always use current date
+        currentPage: "checklist", // Always reset to checklist page after import
+        sidebarOpen: false, // Close sidebar after import
+      }
+      break
+
     default:
       return state
   }
@@ -349,14 +441,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     return () => clearInterval(interval)
   }, [])
-
-  useEffect(() => {
-    if (state.isDarkMode) {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  }, [state.isDarkMode])
 
   return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>
 }

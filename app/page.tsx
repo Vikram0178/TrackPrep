@@ -1,9 +1,6 @@
 "use client"
 
 import type React from "react"
-
-import { Menu, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { useApp } from "@/contexts/AppContext"
 import { calculateSubjectProgress } from "@/utils/calculations"
 import { ChapterCard } from "@/components/ChapterCard"
@@ -12,16 +9,18 @@ import { Sidebar } from "@/components/Sidebar"
 import { AnalysisPage } from "@/components/AnalysisPage"
 import { PriorityPage } from "@/components/PriorityPage"
 import { HowToUsePage } from "@/components/HowToUsePage"
+import { RevisionPage } from "@/components/RevisionPage"
+import { TestPage } from "@/components/TestPage"
+import { TestAnalysisPage } from "@/components/TestAnalysisPage"
+import { DataBackupPage } from "@/components/DataBackupPage"
 import { InlineChapterInput } from "@/components/InlineChapterInput"
 import { SubjectInputDialog } from "@/components/SubjectInputDialog"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
-import { OnboardingDialog } from "@/components/OnboardingDialog" // Added onboarding dialog import
+import { OnboardingDialog } from "@/components/OnboardingDialog"
 import { getDailyQuote } from "@/utils/quotes"
 import { calculateDaysUntil } from "@/utils/dateUtils"
 import { getDynamicGreeting } from "@/utils/greetings"
 import { useState, useRef } from "react"
-import { StarIcon } from "@/components/ui/icons"
-import { DarkModeToggle } from "@/components/DarkModeToggle"
 
 export default function SyllabusChecklist() {
   const { state, dispatch } = useApp()
@@ -30,6 +29,7 @@ export default function SyllabusChecklist() {
   const [showAddSubjectDialog, setShowAddSubjectDialog] = useState(false)
   const [showDeleteSubjectDialog, setShowDeleteSubjectDialog] = useState(false)
   const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null)
+  const [isRgbLightActive, setIsRgbLightActive] = useState(false)
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const [isLongPressing, setIsLongPressing] = useState(false)
@@ -67,6 +67,42 @@ export default function SyllabusChecklist() {
     return (
       <>
         <PriorityPage />
+        <Sidebar />
+      </>
+    )
+  }
+
+  if (state.currentPage === "revision") {
+    return (
+      <>
+        <RevisionPage />
+        <Sidebar />
+      </>
+    )
+  }
+
+  if (state.currentPage === "test") {
+    return (
+      <>
+        <TestPage />
+        <Sidebar />
+      </>
+    )
+  }
+
+  if (state.currentPage === "testanalysis") {
+    return (
+      <>
+        <TestAnalysisPage />
+        <Sidebar />
+      </>
+    )
+  }
+
+  if (state.currentPage === "databackup") {
+    return (
+      <>
+        <DataBackupPage />
         <Sidebar />
       </>
     )
@@ -147,21 +183,28 @@ export default function SyllabusChecklist() {
 
   const dynamicGreeting = state.userProfile ? getDynamicGreeting(state.userProfile.name) : ""
 
+  const handleMotivationBoxClick = () => {
+    setIsRgbLightActive(!isRgbLightActive)
+  }
+
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted font-sans transition-colors duration-300">
+      <div className="min-h-screen bg-gray-50 font-sans transition-colors duration-300">
         {/* Header */}
-        <header className="flex items-center justify-between p-4 bg-card/80 backdrop-blur-sm shadow-sm border-b border-border">
+        <header className="flex items-center justify-between p-4 bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <Menu
-              className="w-6 h-6 text-muted-foreground cursor-pointer hover:text-primary transition-all duration-200 hover:scale-110"
+            <div
+              className="w-6 h-6 text-gray-700 cursor-pointer hover:text-gray-900 transition-all duration-200 hover:scale-110 flex flex-col justify-center items-center gap-1"
               onClick={handleMenuClick}
-            />
-            <DarkModeToggle />
+            >
+              <div className="w-4 h-0.5 bg-current"></div>
+              <div className="w-4 h-0.5 bg-current"></div>
+              <div className="w-4 h-0.5 bg-current"></div>
+            </div>
           </div>
           <div className="flex items-center justify-between w-full ml-4">
             <div className="flex flex-col">
-              <h1 className="text-lg font-semibold text-foreground tracking-tight">{examTitle}</h1>
+              <h1 className="text-lg font-semibold text-gray-900 tracking-tight">{examTitle}</h1>
             </div>
             <div className="flex flex-col items-end">
               {isEditingDeadline ? (
@@ -170,17 +213,17 @@ export default function SyllabusChecklist() {
                     type="date"
                     value={tempDeadline}
                     onChange={(e) => setTempDeadline(e.target.value)}
-                    className="text-xs border border-border rounded-lg px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all duration-200"
+                    className="text-xs border border-gray-300 rounded-lg px-2 py-1 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all duration-200"
                   />
                   <button
                     onClick={handleDeadlineSubmit}
-                    className="text-emerald-600 text-xs hover:text-emerald-700 transition-colors duration-200"
+                    className="text-green-600 text-xs hover:text-green-700 transition-colors duration-200"
                   >
                     ✓
                   </button>
                   <button
                     onClick={handleDeadlineCancel}
-                    className="text-muted-foreground text-xs hover:text-foreground transition-colors duration-200"
+                    className="text-red-600 text-xs hover:text-red-700 transition-colors duration-200"
                   >
                     ✕
                   </button>
@@ -188,14 +231,12 @@ export default function SyllabusChecklist() {
               ) : (
                 <div
                   onClick={handleDeadlineClick}
-                  className="bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border border-emerald-200 dark:border-emerald-700 rounded-full px-3 py-1.5 cursor-pointer hover:from-emerald-100 hover:to-emerald-200 dark:hover:from-emerald-800/30 dark:hover:to-emerald-700/30 transition-all duration-200 transform hover:scale-105 shadow-sm"
+                  className="bg-green-100 hover:bg-green-200 border border-green-200 rounded-full px-3 py-1.5 cursor-pointer transition-all duration-200 transform hover:scale-105"
                 >
-                  <span className="text-emerald-700 dark:text-emerald-300 text-xs font-medium">
-                    {daysToJEE} days left
-                  </span>
+                  <span className="text-green-800 text-xs font-medium">{daysToJEE} days left</span>
                 </div>
               )}
-              <div className="text-xs text-muted-foreground mt-1">{state.currentDate}</div>
+              <div className="text-xs text-gray-500 mt-1">{state.currentDate}</div>
             </div>
           </div>
         </header>
@@ -204,61 +245,71 @@ export default function SyllabusChecklist() {
 
         <div className="p-4 space-y-6">
           {state.userProfile && (
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200/50 dark:border-emerald-700/50 rounded-xl p-3 shadow-sm">
-              <p className="text-emerald-700 dark:text-emerald-300 text-sm font-medium">{dynamicGreeting}</p>
+            <div className="bg-green-100 border border-green-200 rounded-xl p-3">
+              <p className="text-green-800 text-sm font-medium">{dynamicGreeting}</p>
             </div>
           )}
 
-          <div className="bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 border border-sky-200/50 dark:border-sky-700/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-sky-100 dark:bg-sky-800/50 rounded-full">
-                <StarIcon className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+          <div
+            className={`bg-blue-50 border border-blue-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden rgb-rotating-light ${isRgbLightActive ? "active" : ""}`}
+            onClick={handleMotivationBoxClick}
+          >
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <div className="w-4 h-4 text-blue-600 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="text-blue-800 font-semibold tracking-tight">Daily Motivation</h2>
               </div>
-              <h2 className="text-sky-700 dark:text-sky-300 font-semibold tracking-tight">Daily Motivation</h2>
+              <p className="text-blue-700 italic text-sm leading-relaxed pl-11">"{dailyQuote}"</p>
             </div>
-            <p className="text-foreground italic text-sm leading-relaxed pl-11">"{dailyQuote}"</p>
           </div>
 
           <div className="flex flex-wrap gap-3 items-center">
-            {subjectProgresses.map((subject) => (
-              <div key={subject.id} className="relative group">
-                <Button
-                  onClick={() => handleSubjectChange(subject.id)}
-                  onMouseDown={(e) => handleSubjectLongPressStart(subject.id, e)}
-                  onMouseUp={handleSubjectLongPressEnd}
-                  onMouseLeave={handleSubjectLongPressEnd}
-                  onTouchStart={(e) => handleSubjectLongPressStart(subject.id, e)}
-                  onTouchEnd={handleSubjectLongPressEnd}
-                  className={`
-                    ${
-                      state.activeSubject === subject.id
-                        ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-full px-6 py-2.5 text-sm font-semibold shadow-md transform hover:scale-105 transition-all duration-200"
-                        : "border-slate-300 text-slate-600 rounded-full px-6 py-2.5 text-sm font-medium bg-white hover:bg-slate-50 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200"
-                    }
-                    ${isLongPressing ? "scale-95 opacity-75" : ""}
-                    select-none user-select-none
-                  `}
-                  variant={state.activeSubject === subject.id ? "default" : "outline"}
-                  style={{
-                    WebkitUserSelect: "none",
-                    MozUserSelect: "none",
-                    msUserSelect: "none",
-                    userSelect: "none",
-                    WebkitTouchCallout: "none",
-                  }}
-                >
-                  {subject.shortName} ({subject.progress}%)
-                </Button>
-              </div>
-            ))}
+            {subjectProgresses.map((subject, index) => {
+              return (
+                <div key={subject.id} className="relative group">
+                  <button
+                    onClick={() => handleSubjectChange(subject.id)}
+                    onMouseDown={(e) => handleSubjectLongPressStart(subject.id, e)}
+                    onMouseUp={handleSubjectLongPressEnd}
+                    onMouseLeave={handleSubjectLongPressEnd}
+                    onTouchStart={(e) => handleSubjectLongPressStart(subject.id, e)}
+                    onTouchEnd={handleSubjectLongPressEnd}
+                    className={`
+                      ${
+                        state.activeSubject === subject.id
+                          ? "bg-green-500 hover:bg-green-600 text-white rounded-full px-6 py-2.5 text-sm font-semibold shadow-md transform hover:scale-105 transition-all duration-200"
+                          : "border-2 border-gray-300 text-gray-700 rounded-full px-6 py-2.5 text-sm font-medium bg-white hover:bg-gray-50 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 hover:border-gray-400"
+                      }
+                      ${isLongPressing ? "scale-95 opacity-75" : ""}
+                      select-none user-select-none
+                    `}
+                    tabIndex={-1}
+                    style={{
+                      WebkitUserSelect: "none",
+                      MozUserSelect: "none",
+                      msUserSelect: "none",
+                      userSelect: "none",
+                      WebkitTouchCallout: "none",
+                    }}
+                  >
+                    {subject.shortName} ({subject.progress}%)
+                  </button>
+                </div>
+              )
+            })}
 
-            {/* Add Subject Button */}
             <button
               onClick={() => setShowAddSubjectDialog(true)}
-              className="w-10 h-10 bg-emerald-100 hover:bg-emerald-200 text-emerald-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-sm"
+              className="w-10 h-10 bg-green-100 hover:bg-green-200 text-green-700 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 border border-green-200"
               title="Add Subject"
             >
-              <Plus className="w-5 h-5" />
+              <span className="text-lg font-bold">+</span>
             </button>
           </div>
 

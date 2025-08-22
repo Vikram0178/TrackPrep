@@ -48,6 +48,8 @@ export function ChapterCard({ chapter }: ChapterCardProps) {
   const [editingActivityName, setEditingActivityName] = useState("")
   const [showDifficultyDropdown, setShowDifficultyDropdown] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showActivityDeleteConfirm, setShowActivityDeleteConfirm] = useState(false)
+  const [activityToDelete, setActivityToDelete] = useState<string | null>(null)
 
   const progress = calculateChapterProgress(chapter.activities)
 
@@ -132,15 +134,37 @@ export function ChapterCard({ chapter }: ChapterCardProps) {
     setEditingActivityName(currentName)
   }
 
+  const handleActivityLongPress = (activityId: string) => {
+    setActivityToDelete(activityId)
+    setShowActivityDeleteConfirm(true)
+  }
+
+  const handleConfirmActivityDelete = () => {
+    if (activityToDelete) {
+      handleDeleteActivity(activityToDelete)
+      setActivityToDelete(null)
+    }
+    setShowActivityDeleteConfirm(false)
+  }
+
+  const handleCancelActivityDelete = () => {
+    setActivityToDelete(null)
+    setShowActivityDeleteConfirm(false)
+  }
+
+  const getActivityIcon = (activityName: string) => {
+    const name = activityName.toLowerCase()
+    if (name.includes("note")) return <FileTextIcon className="w-3 h-3" />
+    if (name.includes("dpp")) return <ClipboardIcon className="w-3 h-3" />
+    if (name.includes("module")) return <BookIcon className="w-3 h-3" />
+    return <BookIcon className="w-3 h-3" />
+  }
+
   const handleActivityNameSave = () => {
-    if (editingActivityName.trim() && editingActivityId) {
+    if (editingActivityId && editingActivityName.trim()) {
       dispatch({
         type: "RENAME_ACTIVITY",
-        payload: {
-          chapterId: chapter.id,
-          activityId: editingActivityId,
-          newName: editingActivityName.trim(),
-        },
+        payload: { chapterId: chapter.id, activityId: editingActivityId, newName: editingActivityName.trim() },
       })
     }
     setEditingActivityId(null)
@@ -150,14 +174,6 @@ export function ChapterCard({ chapter }: ChapterCardProps) {
   const handleActivityNameCancel = () => {
     setEditingActivityId(null)
     setEditingActivityName("")
-  }
-
-  const getActivityIcon = (activityName: string) => {
-    const name = activityName.toLowerCase()
-    if (name.includes("note")) return <FileTextIcon className="w-3 h-3" />
-    if (name.includes("dpp")) return <ClipboardIcon className="w-3 h-3" />
-    if (name.includes("module")) return <BookIcon className="w-3 h-3" />
-    return <BookIcon className="w-3 h-3" />
   }
 
   return (
@@ -300,12 +316,48 @@ export function ChapterCard({ chapter }: ChapterCardProps) {
                 ) : (
                   <label
                     htmlFor={activity.id}
-                    className={`text-sm cursor-pointer transition-all duration-200 ${
+                    className={`text-sm cursor-pointer transition-all duration-200 select-none ${
                       activity.completed ? "text-emerald-600 font-semibold" : "text-slate-700 hover:text-emerald-600"
                     }`}
                     onClick={(e) => {
                       e.preventDefault()
                       handleActivityNameClick(activity.id, activity.name)
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      const timer = setTimeout(() => {
+                        handleActivityLongPress(activity.id)
+                      }, 1000)
+
+                      const cleanup = () => {
+                        clearTimeout(timer)
+                        document.removeEventListener("mouseup", cleanup)
+                        document.removeEventListener("mouseleave", cleanup)
+                      }
+
+                      document.addEventListener("mouseup", cleanup)
+                      document.addEventListener("mouseleave", cleanup)
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault()
+                      const timer = setTimeout(() => {
+                        handleActivityLongPress(activity.id)
+                      }, 1000)
+
+                      const cleanup = () => {
+                        clearTimeout(timer)
+                        document.removeEventListener("touchend", cleanup)
+                        document.removeEventListener("touchcancel", cleanup)
+                      }
+
+                      document.addEventListener("touchend", cleanup)
+                      document.addEventListener("touchcancel", cleanup)
+                    }}
+                    style={{
+                      userSelect: "none",
+                      WebkitUserSelect: "none",
+                      MozUserSelect: "none",
+                      msUserSelect: "none",
                     }}
                   >
                     {activity.name}
@@ -385,6 +437,15 @@ export function ChapterCard({ chapter }: ChapterCardProps) {
         message={`Are you sure you want to delete "${chapter.name}"? This action cannot be undone.`}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+      />
+
+      {/* Confirmation dialog for activity deletion */}
+      <ConfirmDialog
+        isOpen={showActivityDeleteConfirm}
+        title="Delete Activity"
+        message="Are you sure you want to delete this activity? This action cannot be undone."
+        onConfirm={handleConfirmActivityDelete}
+        onCancel={handleCancelActivityDelete}
       />
     </>
   )

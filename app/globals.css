@@ -1,77 +1,79 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Updated to clean light gray aesthetic matching reference design */
+  --background: oklch(0.98 0.005 200);
+  --foreground: oklch(0.15 0.01 200);
+  --card: oklch(0.99 0.002 200);
+  --card-foreground: oklch(0.15 0.01 200);
+  --popover: oklch(0.99 0.002 200);
+  --popover-foreground: oklch(0.15 0.01 200);
+  --primary: oklch(0.45 0.15 140);
+  --primary-foreground: oklch(0.98 0.005 200);
+  --secondary: oklch(0.94 0.01 200);
+  --secondary-foreground: oklch(0.25 0.02 200);
+  --muted: oklch(0.95 0.008 200);
+  --muted-foreground: oklch(0.45 0.01 200);
+  --accent: oklch(0.92 0.02 200);
+  --accent-foreground: oklch(0.25 0.02 200);
+  --destructive: oklch(0.6 0.2 15);
+  --destructive-foreground: oklch(0.98 0.005 200);
+  --border: oklch(0.88 0.01 200);
+  --input: oklch(0.92 0.01 200);
+  --ring: oklch(0.45 0.15 140);
+  --chart-1: oklch(0.55 0.18 140);
+  --chart-2: oklch(0.6 0.15 180);
+  --chart-3: oklch(0.5 0.16 200);
+  --chart-4: oklch(0.65 0.12 160);
+  --chart-5: oklch(0.58 0.14 120);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.99 0.002 200);
+  --sidebar-foreground: oklch(0.15 0.01 200);
+  --sidebar-primary: oklch(0.45 0.15 140);
+  --sidebar-primary-foreground: oklch(0.98 0.005 200);
+  --sidebar-accent: oklch(0.92 0.02 200);
+  --sidebar-accent-foreground: oklch(0.25 0.02 200);
+  --sidebar-border: oklch(0.88 0.01 200);
+  --sidebar-ring: oklch(0.45 0.15 140);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Kept dark mode but updated to complement the clean aesthetic */
+  --background: oklch(0.08 0.01 200);
+  --foreground: oklch(0.95 0.005 200);
+  --card: oklch(0.1 0.01 200);
+  --card-foreground: oklch(0.95 0.005 200);
+  --popover: oklch(0.1 0.01 200);
+  --popover-foreground: oklch(0.95 0.005 200);
+  --primary: oklch(0.6 0.12 140);
+  --primary-foreground: oklch(0.08 0.01 200);
+  --secondary: oklch(0.18 0.02 200);
+  --secondary-foreground: oklch(0.95 0.005 200);
+  --muted: oklch(0.15 0.02 200);
+  --muted-foreground: oklch(0.65 0.01 200);
+  --accent: oklch(0.2 0.03 200);
+  --accent-foreground: oklch(0.95 0.005 200);
+  --destructive: oklch(0.65 0.18 15);
+  --destructive-foreground: oklch(0.95 0.005 200);
+  --border: oklch(0.25 0.02 200);
+  --input: oklch(0.2 0.03 200);
+  --ring: oklch(0.6 0.12 140);
+  --chart-1: oklch(0.6 0.15 140);
+  --chart-2: oklch(0.65 0.12 180);
+  --chart-3: oklch(0.55 0.13 200);
+  --chart-4: oklch(0.7 0.1 160);
+  --chart-5: oklch(0.62 0.12 120);
+  --sidebar: oklch(0.12 0.015 200);
+  --sidebar-foreground: oklch(0.95 0.005 200);
+  --sidebar-primary: oklch(0.6 0.12 140);
+  --sidebar-primary-foreground: oklch(0.08 0.01 200);
+  --sidebar-accent: oklch(0.2 0.03 200);
+  --sidebar-accent-foreground: oklch(0.95 0.005 200);
+  --sidebar-border: oklch(0.25 0.02 200);
+  --sidebar-ring: oklch(0.6 0.12 140);
 }
 
 @theme inline {
@@ -116,8 +118,88 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Kept performance optimizations but removed animation-specific styles */
+.animate-pulse,
+.animate-spin,
+.animate-bounce {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Optimize transitions for better performance */
+.transition-all,
+.transition-colors,
+.transition-opacity,
+.transition-transform {
+  will-change: auto;
+}
+
+.transition-all:hover,
+.transition-colors:hover,
+.transition-opacity:hover,
+.transition-transform:hover {
+  will-change: transform, opacity, color, background-color;
+}
+
+/* Adding enhanced RGB rotating light with higher intensity and continuous rotation for daily motivation box */
+.rgb-rotating-light {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.rgb-rotating-light::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 0, 128, 0.8) 0deg,
+    rgba(255, 128, 0, 0.8) 60deg,
+    rgba(128, 255, 0, 0.8) 120deg,
+    rgba(0, 255, 128, 0.8) 180deg,
+    rgba(0, 128, 255, 0.8) 240deg,
+    rgba(128, 0, 255, 0.8) 300deg,
+    rgba(255, 0, 128, 0.8) 360deg
+  );
+  border-radius: inherit;
+  animation: rgb-rotate 2s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.rgb-rotating-light.active::before {
+  opacity: 1;
+}
+
+@keyframes rgb-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.rgb-rotating-light::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+  z-index: 1;
 }
