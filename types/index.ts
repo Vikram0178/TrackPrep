@@ -4,6 +4,13 @@ export interface Activity {
   completed: boolean
 }
 
+export interface RevisionEntry {
+  id: string
+  timestamp: string
+  date: string
+  time: string
+}
+
 export interface Chapter {
   id: string
   name: string
@@ -13,7 +20,10 @@ export interface Chapter {
   difficulty?: "easy" | "medium" | "hard" | "none"
   lastRevisedDate?: string // Added revision tracking field
   scheduledRevisionDate?: string // Added revision scheduling fields
+  scheduledRevisionTime?: string // Added time field for revision scheduling
   notificationEnabled?: boolean // Added revision scheduling fields
+  revisionHistory?: RevisionEntry[] // Track all revision sessions
+  revisionCount?: number // Total number of revisions
 }
 
 export interface Subject {
@@ -83,9 +93,13 @@ export type AppAction =
   | { type: "ADD_SUBJECT"; payload: Subject }
   | { type: "DELETE_SUBJECT"; payload: string }
   | { type: "MARK_CHAPTER_REVISED"; payload: { chapterId: string } }
+  | { type: "UNDO_CHAPTER_REVISION"; payload: { chapterId: string } }
   | { type: "ADD_TEST"; payload: Test }
   | { type: "EDIT_TEST"; payload: { testId: string; testData: Test } }
   | { type: "DELETE_TEST"; payload: { testId: string } }
   | { type: "IMPORT_DATA"; payload: AppState }
-  | { type: "SCHEDULE_REVISION"; payload: { chapterId: string; date: string; enableNotification: boolean } } // Added revision scheduling actions
+  | {
+      type: "SCHEDULE_REVISION"
+      payload: { chapterId: string; date: string; time: string; enableNotification: boolean }
+    } // Added time parameter to revision scheduling
   | { type: "CANCEL_REVISION_SCHEDULE"; payload: { chapterId: string } } // Added revision scheduling actions

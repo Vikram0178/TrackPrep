@@ -56,7 +56,11 @@ type AppAction =
   | { type: "SET_CHAPTER_DIFFICULTY"; payload: { chapterId: string; difficulty: "easy" | "medium" | "hard" | "none" } }
   | { type: "SET_CHAPTER_TARGET_DATE"; payload: { chapterId: string; targetDate: string } }
   | { type: "MARK_CHAPTER_REVISED"; payload: { chapterId: string } } // Added revision tracking action
-  | { type: "SCHEDULE_REVISION"; payload: { chapterId: string; date: string; enableNotification: boolean } } // Added revision scheduling action
+  | { type: "UNDO_CHAPTER_REVISION"; payload: { chapterId: string } } // Added undo revision action
+  | {
+      type: "SCHEDULE_REVISION"
+      payload: { chapterId: string; date: string; time: string; enableNotification: boolean }
+    } // Added time parameter to revision scheduling
   | { type: "CANCEL_REVISION_SCHEDULE"; payload: { chapterId: string } } // Added cancel revision schedule action
   | { type: "ADD_ACTIVITY"; payload: { chapterId: string; name: string } }
   | { type: "RENAME_ACTIVITY"; payload: { chapterId: string; activityId: string; newName: string } }
@@ -187,21 +191,71 @@ function appReducer(state: AppState, action: AppAction): AppState {
       }
       break
 
-    case "MARK_CHAPTER_REVISED": // Added revision tracking case
+    case "MARK_CHAPTER_REVISED": // Enhanced revision tracking with history and count
       newState = {
         ...state,
         subjects: state.subjects.map((subject) => ({
           ...subject,
-          chapters: subject.chapters.map((chapter) =>
-            chapter.id === action.payload.chapterId
-              ? { ...chapter, lastRevisedDate: new Date().toISOString() }
-              : chapter,
-          ),
+          chapters: subject.chapters.map((chapter) => {
+            if (chapter.id === action.payload.chapterId) {
+              const now = new Date()
+              const newRevisionEntry = {
+                id: `revision-${Date.now()}`,
+                timestamp: now.toISOString(),
+                date: now.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }),
+                time: now.toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              }
+
+              const currentHistory = chapter.revisionHistory || []
+              const newHistory = [...currentHistory, newRevisionEntry]
+
+              return {
+                ...chapter,
+                lastRevisedDate: now.toISOString(),
+                revisionHistory: newHistory,
+                revisionCount: newHistory.length,
+              }
+            }
+            return chapter
+          }),
         })),
       }
       break
 
-    case "SCHEDULE_REVISION": // Added revision scheduling case
+    case "UNDO_CHAPTER_REVISION": // Added undo revision functionality
+      newState = {
+        ...state,
+        subjects: state.subjects.map((subject) => ({
+          ...subject,
+          chapters: subject.chapters.map((chapter) => {
+            if (chapter.id === action.payload.chapterId) {
+              const currentHistory = chapter.revisionHistory || []
+              if (currentHistory.length === 0) return chapter
+
+              const newHistory = currentHistory.slice(0, -1)
+              const lastRevision = newHistory[newHistory.length - 1]
+
+              return {
+                ...chapter,
+                lastRevisedDate: lastRevision?.timestamp || undefined,
+                revisionHistory: newHistory,
+                revisionCount: newHistory.length,
+              }
+            }
+            return chapter
+          }),
+        })),
+      }
+      break
+
+    case "SCHEDULE_REVISION": // Updated revision scheduling to include time field
       newState = {
         ...state,
         subjects: state.subjects.map((subject) => ({
@@ -211,6 +265,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
               ? {
                   ...chapter,
                   scheduledRevisionDate: action.payload.date,
+                  scheduledRevisionTime: action.payload.time,
                   notificationEnabled: action.payload.enableNotification,
                 }
               : chapter,
@@ -219,7 +274,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       }
       break
 
-    case "CANCEL_REVISION_SCHEDULE": // Added cancel revision schedule case
+    case "CANCEL_REVISION_SCHEDULE": // Updated to clear both date and time fields
       newState = {
         ...state,
         subjects: state.subjects.map((subject) => ({
@@ -229,6 +284,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
               ? {
                   ...chapter,
                   scheduledRevisionDate: undefined,
+                  scheduledRevisionTime: undefined,
                   notificationEnabled: undefined,
                 }
               : chapter,
